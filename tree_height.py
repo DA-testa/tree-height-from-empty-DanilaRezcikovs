@@ -4,54 +4,39 @@ import sys
 import threading
 import numpy
 
-class node:
-    def __init__(self, idx):
-        self.idx = idx
-        self.children = []
 
-def construct_tree(n, parents):
-    nodes = [node(i) for i in range(n)]
+def compute_height(n, parents):
+    # Create a list to store the depth of each node
+    depth = [0] * n
+
+    # Find the root node
     root = None
     for i in range(n):
-        parent = parents[i]
-        if parent == -1:
-            root = nodes[i]
+        if parents[i] == -1:
+            root = i
+            break
+
+    # Recursively traverse each subtree and update the depth of each node
+    def traverse(node):
+        if depth[node] != 0:
+            return depth[node]
+
+        if parents[node] == -1:
+            depth[node] = 1
         else:
-            nodes[parent].children.append(nodes[i])
-    return root
-def compute_height(node):
-    if not node.children:
-        return 0
-    
-    # Write this function
-    max_height = 0
-    # Your code here
-    for child in node.children:
-        max_height = max(max_height, compute_height(child))
-    return max_height + 1
+            depth[node] = 1 + traverse(parents[node])
 
+        return depth[node]
 
-def main():
-    n = int(input())
-    parents = list(map(int, input().split()))
-    root = construct_tree(n, parents)
-    height = compute_height(root)
-    print(height)
-    # implement input form keyboard and from files
-    
-    # let user input file name to use, don't allow file names with letter a
-    # account for github input inprecision
-    
-    # input number of elements
-    # input values in one variable, separate with space, split these values in an array
-    # call the function and output it's result
-    pass
+    # Traverse the tree starting from the root
+    traverse(root)
 
-# In Python, the default limit on recursion depth is rather low,
-# so raise it here for this problem. Note that to take advantage
-# of bigger stack, we have to launch the computation in a new thread.
-sys.setrecursionlimit(10**7)  # max depth of recursion
-threading.stack_size(2**27)   # new thread will get stack of such size
-threading.Thread(target=main).start()
-main()
-print(numpy.array([1,2,3]))
+    # Return the maximum depth
+    return max(depth)
+
+# Read input
+n = int(input())
+parents = list(map(int, input().split()))
+
+# Compute and print the height of the tree
+print(compute_height(n, parents))
