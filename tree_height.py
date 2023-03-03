@@ -4,15 +4,39 @@ import sys
 import threading
 import numpy
 
+class node:
+    def __init__(self, idx):
+        self.idx = idx
+        self.children = []
 
-def compute_height(n, parents):
+def construct_tree(n, parents):
+    nodes = [node(i) for i in range(n)]
+    root = None
+    for i in range(n):
+        parent = parents[i]
+        if parent == -1:
+            root = nodes[i]
+        else:
+            nodes[parent].children.append(nodes[i])
+    return root
+def compute_height(node):
+    if not node.children:
+        return 0
+    
     # Write this function
     max_height = 0
     # Your code here
-    return max_height
+    for child in node.children:
+        max_height = max(max_height, compute_height(child))
+    return max_height + 1
 
 
 def main():
+    n = int(input())
+    parents = list(map(int, input().split()))
+    root = construct_tree(n, parents)
+    height = compute_height(root)
+    print(height)
     # implement input form keyboard and from files
     
     # let user input file name to use, don't allow file names with letter a
