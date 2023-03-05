@@ -11,9 +11,12 @@ class Node:
         self.children = []
         self.parent = None
 
-n = int(input().strip())
-parent_indices = list(map(int, input().strip().split()))
-
+n_str = input().strip()
+print(f"n_str = '{n_str}'")
+n = int(n_str)
+parent_indices_str = input().strip()
+print(f"parent_indices_str = '{parent_indices_str}'")
+parent_indices = list(map(int, parent_indices_str.split()))
 nodes = [Node(i) for i in range(n)]
 
 for i in range(n):
