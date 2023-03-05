@@ -1,33 +1,34 @@
-# python3
-
-import sys
-import threading
-import numpy
-import re
-
+import os
 
 class Node:
-    def __init__(self, index):
+    def __init__(self, index, value):
         self.index = index
+        self.value = value
         self.children = []
 
 def compute_height(nodes):
     root = None
-    for i, parent_index in enumerate(nodes):
-        if parent_index == -1:
+    for i, node in enumerate(nodes):
+        if node.value == -1:
             root = i
         else:
-            nodes[parent_index].children.append(nodes[i])
-    return get_height(root)
+            nodes[node.value].children.append(node)
+    if root is not None:
+        root_node = nodes[root]
+        return get_height(root_node)
+    else:
+        return 0
+
 
 def get_height(node):
     if not node.children:
         return 1
-    return 1 + max([get_height(child) for child in node.children])
+    heights = [get_height(child) for child in node.children]
+    height = 1 + max(heights)
+    return height
 
-if __name__ == '__main__':
-    import os
 
+def main():
     input_type = input("Input data from keyboard (I) or file (F)? ").upper()
     while input_type not in ['I', 'F']:
         print("Invalid input. Please enter I or F.")
@@ -35,16 +36,20 @@ if __name__ == '__main__':
 
     if input_type == 'I':
         n = int(input("Enter the number of nodes: "))
-        parents = list(map(int, input("Enter the list of parents for each node (-1 for root): ").split()))
+        values = list(map(int, input("Enter the values for each node: ").split()))
     else:
         file_name = input("Enter the file name (without letter 'a'): ")
         while 'a' in file_name:
             print("Invalid file name. Please enter a file name without the letter 'a'.")
             file_name = input("Enter the file name (without letter 'a'): ")
-        file_path = os.path.join('folder', file_name)
+        file_path = os.path.join('test', file_name)
         with open(file_path, 'r') as f:
             n = int(f.readline())
-            parents = list(map(int, f.readline().split()))
+            values = list(map(int, f.readline().split()))
 
-    nodes = [Node(i) for i in range(n)]
+    nodes = [Node(i, values[i]) for i in range(n)]
     print(compute_height(nodes))
+
+
+if __name__ == '__main__':
+    main()
