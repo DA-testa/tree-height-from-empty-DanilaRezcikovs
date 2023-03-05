@@ -5,38 +5,31 @@ import threading
 import numpy
 
 
-def compute_height(n, parents):
-    # Create a list to store the depth of each node
-    depth = [0] * n
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.children = []
+        self.parent = None
 
-    # Find the root node
-    root = None
-    for i in range(n):
-        if parents[i] == -1:
-            root = i
-            break
-
-    # Recursively traverse each subtree and update the depth of each node
-    def traverse(node):
-        if depth[node] != 0:
-            return depth[node]
-
-        if parents[node] == -1:
-            depth[node] = 1
-        else:
-            depth[node] = 1 + traverse(parents[node])
-
-        return depth[node]
-
-    # Traverse the tree starting from the root
-    traverse(root)
-
-    # Return the maximum depth
-    return max(depth)
-
-# Read input
 n = int(input())
-parents = list(map(int, input().split()))
+parent_indices = list(map(int, input().split()))
 
-# Compute and print the height of the tree
-print(compute_height(n, parents))
+nodes = [Node(i) for i in range(n)]
+
+for i in range(n):
+    parent_index = parent_indices[i]
+    if parent_index == -1:
+        root = nodes[i]
+    else:
+        parent_node = nodes[parent_index]
+        parent_node.children.append(nodes[i])
+        nodes[i].parent = parent_node
+
+def max_depth(node):
+    if not node.children:
+        return 1
+    else:
+        return 1 + max(max_depth(child) for child in node.children)
+
+height = max_depth(root)
+print(height)
