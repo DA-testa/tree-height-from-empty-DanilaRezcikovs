@@ -1,65 +1,57 @@
-import os
+# python3
+
+import sys
+import threading
+import numpy
 
 class Node:
-    def __init__(self, index, value):
-        self.index = index
+    def __init__(self, value):
         self.value = value
         self.children = []
 
-def compute_height(nodes):
-    root = None
-    for i, node in enumerate(nodes):
-        if node.value == -1:
-            root = i
+def tree_build(n, parents):
+    nodes = [Node(i) for i in range(n)]
+    for i in range(n):
+        parent = parents[i]
+        if parent == -1:
+            root = nodes[i]
         else:
-            nodes[node.value].children.append(node)
-    if root is not None:
-        root_node = nodes[root]
-        return get_height(root_node)
-    else:
-        return 0
+            nodes[parent].children.append(nodes[i])
+    return root
 
-
-def get_height(node):
-    if not node.children:
+def get_height(root):
+    if not root.children:
         return 1
-    heights = [get_height(child) for child in node.children]
-    height = 1 + max(heights)
-    return height
+    max_depth = 0
+    for child in root.children:
+        max_depth = max(max_depth, get_height(child))
+    return max_depth+1
+        
+
+def compute_height(n, parents):
+    root = tree_build(n, parents)
+    return get_height(root)
 
 
 def main():
-    input_type = input("Input data from keyboard (I) or file (F)? ").upper()
-    while input_type not in ['I', 'F']:
-        print("Invalid input. Please enter I or F.")
-        input_type = input("Input data from keyboard (I) or file (F)? ").upper()
-
+    input_type = input().strip()
     if input_type == 'I':
-        n_str = input("Enter the number of nodes: ")
-        while not n_str.isdigit():
-            print("Invalid input. Please enter a positive integer.")
-            n_str = input("Enter the number of nodes: ")
-        n = int(n_str)
-
-        values_str = input("Enter the values for each node: ")
-        while len(values_str.split()) != n:
-            print(f"Invalid input. Please enter {n} values.")
-            values_str = input("Enter the values for each node: ")
-        values = list(map(int, values_str.split()))
-
+        n = int(input().strip())
+        parents = list(map(int, input().strip().split()))
     else:
-        file_name = input("Enter the file name (without letter 'a'): ")
-        while 'a' in file_name:
-            print("Invalid file name. Please enter a file name without the letter 'a'.")
-            file_name = input("Enter the file name (without letter 'a'): ")
-        file_path = os.path.join('test', file_name)
-        with open(file_path, 'r') as f:
-            n = int(f.readline())
-            values = list(map(int, f.readline().split()))
-
-    nodes = [Node(i, values[i]) for i in range(n)]
-    print(compute_height(nodes))
+        file = input().strip()
+        if 'a' in file:
+            print("Error")
+            return
+        with open (f"test/{file}") as f:
+            n = int(f.readline().strip())
+            parents = list(map(int, f.readline().strip().split()))
+    print(compute_height(n, parents))
 
 
-if __name__ == '__main__':
-    main()
+# In Python, the default limit on recursion depth is rather low,
+# so raise it here for this problem. Note that to take advantage
+# of bigger stack, we have to launch the computation in a new thread.
+sys.setrecursionlimit(10**7)  # max depth of recursion
+threading.stack_size(2**27)   # new thread will get stack of such size
+threading.Thread(target=main).start()
