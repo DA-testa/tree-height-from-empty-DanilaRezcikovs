@@ -35,8 +35,18 @@ def main():
         input_type = input("Input data from keyboard (I) or file (F)? ").upper()
 
     if input_type == 'I':
-        n = int(input("Enter the number of nodes: "))
-        values = list(map(int, input("Enter the values for each node: ").split()))
+        n_str = input("Enter the number of nodes: ")
+        while not n_str.isdigit():
+            print("Invalid input. Please enter a positive integer.")
+            n_str = input("Enter the number of nodes: ")
+        n = int(n_str)
+
+        values_str = input("Enter the values for each node: ")
+        while len(values_str.split()) != n:
+            print(f"Invalid input. Please enter {n} values.")
+            values_str = input("Enter the values for each node: ")
+        values = list(map(int, values_str.split()))
+
     else:
         file_name = input("Enter the file name (without letter 'a'): ")
         while 'a' in file_name:
