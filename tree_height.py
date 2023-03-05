@@ -3,6 +3,7 @@
 import sys
 import threading
 import numpy
+import re
 
 
 class Node:
@@ -11,9 +12,9 @@ class Node:
         self.children = []
         self.parent = None
 
-n_str = input().strip()
+n_str = re.sub("[^0-9\-]", "", input())
 n = int(n_str)
-parent_indices_str = input().strip()
+parent_indices_str = re.sub("[^0-9\-]", " ", input())
 parent_indices = list(map(int, parent_indices_str.split()))
 nodes = [Node(i) for i in range(n)]
 
